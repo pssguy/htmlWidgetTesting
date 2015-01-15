@@ -1,0 +1,85 @@
+---
+title: "svgPanZoom widget"
+author: "pssguy"
+date: "Wednesday, January 14, 2015"
+output: html_document
+runtime: shiny
+---
+Testing in rMarkdown document the htmlwidget [svgPanZoom]("https://github.com/timelyportfolio/svgPanZoom") by timelyportfolio which enables R graphics to be pan/zoomable 
+
+
+Just tried ggplot plots
+
+```{r, echo=TRUE}
+
+library(ggplot2)
+library(svgPanZoom)
+#library(SVGAnnotation) # could not run in shiny.io as not CRAN , github
+
+```
+
+First a static version. This appears on 'Run Document' but when opening in browser(Chrome) fails to appear. This may have nothing to do with the widget
+```{r, echo=TRUE}
+p <- ggplot(mtcars, aes(mpg, cyl)) + geom_point(size=3, pch=19) + theme_bw()
+
+ p
+```
+
+Then one with the widget following recommended practice. Using a touchpad, I had to add the controlIconsEnabled = T  
+
+The plot is smaller and does not show axes - at least by default. Panning and zooming works fine
+
+```{r, echo=TRUE}
+svgPanZoom(
+  svgPlot(
+ show(p)    
+),controlIconsEnabled = T)
+```
+
+
+An alternative method requiring the gridSVG library  
+
+In RStudio viewer, the panning works, and the look (inc axes) is as per static version but the zoom control does not appear
+
+It is a bit weird in rMarkdown. Two static versions folowed by the correct outcome appear. However, when opening in browser it looks fine
+
+```{r, echo=TRUE}
+library(gridSVG)
+
+svgPanZoom(
+ p,controlIconsEnabled = T  
+  )
+```
+
+
+Now try a ggmap
+
+Works fine in browser. Of course zooming in does not provide any extra info
+but could still be useful
+
+```{r, echo=TRUE}
+library(ggmap)
+hdf <- get_map()
+q <-ggmap(hdf, extent = 'normal')
+
+svgPanZoom(
+ q,controlIconsEnabled = T  
+  )
+```
+Publishing to shiny.io proved problematic
+
+"Unable to deploy package dependency 'SVGAnnotation'
+   
+   The package was installed locally from source. Only packages
+   installed from CRAN, BioConductor and GitHub are supported.
+Execution halted"
+
+But this is on GitHub??
+
+
+removing this package it failed in attempt to build svgPanZoom 
+
+Error in loadNamespace(i, c(lib.loc, .libPaths()), versionCheck = vI[[i]]) : 
+  there is no package called �htmlwidgets�
+ERROR: lazy loading failed for package �svgPanZoom�
+* removing �/usr/local/lib/R/site-library/svgPanZoom�
